@@ -1,0 +1,137 @@
+CREATE DATABASE school_info;
+
+
+-- Instructors Table
+CREATE TABLE instructors (
+    instructor_id SERIAL PRIMARY KEY,
+    instructor_name VARCHAR(100),
+    main_subject VARCHAR(50)
+);
+
+-- Grades Table
+CREATE TABLE grades (
+    grade_id SERIAL PRIMARY KEY,
+    grade_name VARCHAR(50),
+    instructor_id INT REFERENCES instructors(instructor_id)
+);
+
+-- Pupils Table
+CREATE TABLE pupils (
+    pupil_id SERIAL PRIMARY KEY,
+    pupil_name VARCHAR(100),
+    grade_id INT REFERENCES grades(grade_id),
+    date_of_birth DATE,
+    gender VARCHAR(10)
+);
+
+-- Courses Table
+CREATE TABLE courses (
+    course_id SERIAL PRIMARY KEY,
+    course_name VARCHAR(50),
+    grade_id INT REFERENCES grades(grade_id)
+);
+
+-- Results Table
+CREATE TABLE results (
+    result_id SERIAL PRIMARY KEY,
+    pupil_id INT REFERENCES pupils(pupil_id),
+    course_id INT REFERENCES courses(course_id),
+    score INT
+);
+
+-- Payments Table
+CREATE TABLE payments (
+    payment_id SERIAL PRIMARY KEY,
+    pupil_id INT REFERENCES pupils(pupil_id),
+    amount NUMERIC(10,2),
+    payment_day DATE,
+    payment_status VARCHAR(20)
+);
+-- Instructors
+INSERT INTO instructors (instructor_name, main_subject) VALUES
+('Kavitha Reddy', 'Mathematics'),
+('Ramesh Gowda', 'Science'),
+('Lakshmi Nair', 'English'),
+('Manoj Krishnan', 'History');
+
+-- Grades
+INSERT INTO grades (grade_name, instructor_id) VALUES
+('Grade 10A', 1),
+('Grade 10B', 2),
+('Grade 9A', 3),
+('Grade 9B', 4);
+
+-- Pupils
+INSERT INTO pupils (pupil_name, grade_id, date_of_birth, gender) VALUES
+('Tanvi Rao', 1, '2008-02-12', 'Female'),
+('Aditya Menon', 1, '2008-06-24', 'Male'),
+('Sneha Pillai', 2, '2009-03-09', 'Female'),
+('Vivek Kumar', 2, '2009-07-30', 'Male'),
+('Ananya Das', 3, '2009-09-10', 'Female'),
+('Yash Sharma', 3, '2009-11-20', 'Male'),
+('Diya Bhat', 4, '2010-01-17', 'Female'),
+('Aravind R', 4, '2010-05-05', 'Male');
+
+-- Courses
+INSERT INTO courses (course_name, grade_id) VALUES
+('Mathematics', 1),
+('Science', 1),
+('English', 2),
+('History', 3),
+('Geography', 4);
+
+-- Results
+INSERT INTO results (pupil_id, course_id, score) VALUES
+(1, 1, 94),
+(1, 2, 89),
+(2, 1, 76),
+(2, 2, 83),
+(3, 3, 91),
+(4, 3, 80),
+(5, 4, 87),
+(6, 4, 92),
+(7, 5, 88),
+(8, 5, 74);
+
+-- Payments
+INSERT INTO payments (pupil_id, amount, payment_day, payment_status) VALUES
+(1, 6200.00, '2025-04-08', 'Paid'),
+(2, 6200.00, '2025-04-09', 'Paid'),
+(3, 6100.00, '2025-04-10', 'Pending'),
+(4, 6100.00, '2025-04-07', 'Paid'),
+(5, 5800.00, '2025-04-09', 'Pending'),
+(6, 5800.00, '2025-04-10', 'Paid'),
+(7, 5600.00, '2025-04-08', 'Paid'),
+(8, 5600.00, '2025-04-12', 'Pending');
+
+select * from results;
+select *from payments;
+select * from courses;
+select *from grades;
+select * from instructors;
+select * from pupils;
+
+SELECT p.pupil_name, g.grade_name, i.instructor_name
+FROM pupils p
+JOIN grades g ON p.grade_id = g.grade_id
+JOIN instructors i ON g.instructor_id = i.instructor_id;
+
+SELECT p.pupil_name, SUM(r.score) AS total_score
+FROM pupils p
+JOIN results r ON p.pupil_id = r.pupil_id
+GROUP BY p.pupil_name
+ORDER BY total_score DESC;
+
+SELECT p.pupil_name, pay.amount, pay.payment_status
+FROM pupils p
+JOIN payments pay ON p.pupil_id = pay.pupil_id
+WHERE pay.payment_status = 'Pending';
+
+SELECT g.grade_name, p.pupil_name, SUM(r.score) AS total_score
+FROM pupils p
+JOIN grades g ON p.grade_id = g.grade_id
+JOIN results r ON p.pupil_id = r.pupil_id
+GROUP BY g.grade_name, p.pupil_name
+ORDER BY g.grade_name, total_score DESC;
+
+SELECT instructor_name, main_subject FROM instructors;
