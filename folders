@@ -1,0 +1,9 @@
+school_website/
+│
+├── app.py
+├── database.py
+├── templates/
+│   └── home.html
+│   └── students.html
+└── static/
+    └── style.css
